@@ -128,7 +128,7 @@ namespace PdfStitcher
                             return;
                         }
 
-                        pdfDocument.Save(@args[1] + "\\merged.pdf");
+                        pdfDocument.Save(@args[2] + "\\merged.pdf");
                         Console.WriteLine("PDF Created");
                         try
                         {
