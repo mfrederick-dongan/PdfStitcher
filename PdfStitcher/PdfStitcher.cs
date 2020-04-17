@@ -16,12 +16,12 @@ namespace PdfStitcher
         {
             if (args.Length == 0)
             {
-                Console.WriteLine("Commands: -Help (h/H/help/Help), -Inventor (i/I/inventor/Inventor), -Pdf (p/P/pdf/Pdf), -Dir (d/D/dir/Dir");
+                Console.WriteLine("Commands: -Help (h/H/help/Help), -Inventor (i/I/inventor/Inventor), -Pdf (p/P/pdf/Pdf), -Dir (d/D/dir/Dir, -Pdf rotated (p-r/P-R/pdf-R/PDF-R)");
                 return;
             }                
             PdfDocument pdfDocument;
             switch (args[0])
-            {
+            {               
                 case "-i":
                 case "-I":
                 case "-inventor":
@@ -82,6 +82,51 @@ namespace PdfStitcher
                             Console.WriteLine("Error: returned null document.");
                             return;
                         }                           
+
+                        pdfDocument.Save(@args[1] + "\\merged.pdf");
+                        Console.WriteLine("PDF Created");
+                        try
+                        {
+                            Process.Start("acrobat", @args[1] + "\\merged.pdf");
+                        }
+                        catch (Exception)
+                        {
+                            try
+                            {
+                                Process.Start("AcroRd32", @args[1] + "\\merged.pdf");
+                            }
+                            catch (Exception)
+                            {
+                                try
+                                {
+                                    Process.Start(@args[1] + "\\merged.pdf");
+                                }
+                                catch (Exception)
+                                {
+
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case "-p-r":
+                case "-p-R":
+                case "-P-r":
+                case "-P-R":
+                case "-pdf-r":
+                case "-pdf-R":
+                case "-PDF-r":
+                case "-PDF-R":
+                    if (args.Length < 2)
+                        Console.WriteLine("Not all parameters have a value. {Rotate Degrees, Base Path}");
+                    else
+                    {
+                        pdfDocument = PdfStitchDocuments(args[2], args.Skip(3).ToArray(), args[1]);
+                        if (pdfDocument == null)
+                        {
+                            Console.WriteLine("Error: returned null document.");
+                            return;
+                        }
 
                         pdfDocument.Save(@args[1] + "\\merged.pdf");
                         Console.WriteLine("PDF Created");
@@ -320,8 +365,10 @@ namespace PdfStitcher
             Console.Write("\n");
             return document;
         }
-        static PdfDocument PdfStitchDocuments(string basePath, string[] pdfs = null)
+        static PdfDocument PdfStitchDocuments(string basePath, string[] pdfs = null, string degrees = null)
         {
+            int rotation = 0;
+            int.TryParse(degrees, out rotation);
             int i = 1;
             int count;
             PdfDocument document = new PdfDocument();
@@ -334,9 +381,12 @@ namespace PdfStitcher
                 foreach (string s in files)
                 {
                     using (importPdf = PdfSharp.Pdf.IO.PdfReader.Open(s, PdfSharp.Pdf.IO.PdfDocumentOpenMode.Import))
-                    {
+                    {                        
                         foreach (PdfPage page in importPdf.Pages)
+                        {
+                            page.Rotate = (page.Rotate + rotation) % 360;
                             document.AddPage(page);
+                        }
                         Console.Write("\rStitching PDFs {0} of {1}", i++, count);
                     }
                 }
@@ -349,7 +399,10 @@ namespace PdfStitcher
                     using (importPdf = PdfSharp.Pdf.IO.PdfReader.Open(@basePath + "\\" + (s.Substring(s.Length - 4) == ".pdf" ? s : s + ".pdf"), PdfSharp.Pdf.IO.PdfDocumentOpenMode.Import))
                     {
                         foreach (PdfPage page in importPdf.Pages)
+                        {
+                            page.Rotate = (page.Rotate + rotation) % 360;
                             document.AddPage(page);
+                        }
                         Console.Write("\rStitching PDFs {0} of {1}", i++, count);
                     }
                 }
