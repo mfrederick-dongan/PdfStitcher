@@ -2,7 +2,7 @@
   "profiles": {
     "PdfStitcher": {
       "commandName": "Project",
-      "commandLineArgs": "-d \"M:\\ENGINEERING\\DONGAN_SWS\\Released_Documents\\Winding\" \"^21\""
+      "commandLineArgs": "-t=pdf -o=\"C:\\Users\\Matt\\Desktop\\Dongan\" -d=\"C:\\Users\\Matt\\Desktop\\Dongan\" -f={\"P1\":\"P2\"} -r=90"
     }
   }
 }

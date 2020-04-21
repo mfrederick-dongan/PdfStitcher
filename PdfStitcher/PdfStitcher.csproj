@@ -3,7 +3,16 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net46</TargetFramework>
+    <StartupObject>PdfStitcher.ParameterizedStitcher</StartupObject>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="PdfStitcher.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="PdfStitcher.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="PdfSharp" Version="1.50.5147" />
